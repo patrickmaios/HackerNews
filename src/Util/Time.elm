@@ -62,15 +62,7 @@ posixToDate tz time =
     Date { year = year, month = month, day = day }
 
 
-{-| Formats a `Date` instance.
 
-    import Time
-
-    formatDate (Date { year = 2022, month = Time.Apr, day =  4 }) {- ignore -} --> "2022 Apr 04"
-
-    formatDate (Date { year = 2022, month = Time.Jan, day = 12 }) {- ignore -} --> "2022 Jan 12"
-
--}
 formatDate : Date -> String
 formatDate (Date date) =
     let
@@ -139,9 +131,27 @@ durationBetween (Time.millisToPosix 1000) (Time.millisToPosix 1000) --> Nothing
 
 -}
 durationBetween : Time.Posix -> Time.Posix -> Maybe Duration
-durationBetween _ _ =
-    -- Nothing
-    Debug.todo "durationBetween"
+durationBetween t1 t2 =
+    if Time.posixToMillis t1 < Time.posixToMillis t2 then
+        let
+            diffMillis =
+                (Time.posixToMillis t2) - (Time.posixToMillis t1)
+            
+            seconds = 
+               modBy 60 (diffMillis // 1000)
+
+            minutes =
+                modBy 60 (seconds // 60)
+
+            hours =
+                modBy 24 (minutes // 60)
+
+            days =
+                hours // 24
+        in
+            Just {seconds = (modBy seconds  60), minutes = (modBy minutes  60), hours = (modBy hours  60), days = days }
+    else
+        Nothing
 
 
 {-| Format a `Duration` as a human readable string
@@ -164,6 +174,24 @@ durationBetween _ _ =
 
 -}
 formatDuration : Duration -> String
-formatDuration _ =
-    -- ""
-    Debug.todo "formatDuration"
+formatDuration duration =
+    let
+        plural unit value =
+            if value == 1 then
+                unit
+            else
+                unit ++ "s"
+
+        formatPart unit value =
+            if value > 0 then
+                String.fromInt value ++ " " ++ plural unit value
+            else
+                ""
+        parts =
+            [formatPart "day" duration.days,
+            formatPart "hour" duration.hours,
+            formatPart "minute" duration.minutes,
+            formatPart "second" duration.seconds
+            ] |> List.filter ((<) "" >> not)
+        in 
+            String.join " " parts ++ "ago"

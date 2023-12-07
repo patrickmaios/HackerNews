@@ -7,7 +7,7 @@ module Model exposing
     , Mode(..)
     , Model
     , Msg(..)
-    , initModel
+    , initModel, updateConfig
     )
 
 import Cursor exposing (Cursor)
@@ -18,18 +18,13 @@ import Model.PostsConfig as PostsConfig exposing (PostsConfig, defaultConfig)
 import Time
 
 
+
 type Msg
     = GotTime Time.Posix
     | GotPostIds (Result Http.Error (Maybe PostIds))
     | GotPost (Result Http.Error Post)
     | ConfigChanged PostsConfig.Change
 
-
-update : Msg -> Model -> Model
-update msg model =
-    case msg of
-        
-        _ -> model
 
 type alias LoadingState =
     { config : PostsConfig, time : Time.Posix }
@@ -72,3 +67,7 @@ type alias Config =
 initModel : Config -> Model
 initModel config =
     { config = config, state = Empty { config = defaultConfig } }
+
+updateConfig : PostsConfig.Change -> PostsConfig -> PostsConfig
+updateConfig change config =
+    PostsConfig.applyChanges change config

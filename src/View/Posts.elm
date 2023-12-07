@@ -41,16 +41,19 @@ postTable config currentTime posts =
 tableHeader : Html Msg
 tableHeader = 
   Html.tr [] 
-      [ Html.th [ Html.Attributes.class "post-score"] [ text "score"]
-      , Html.th [ Html.Attributes.class "post-title"] [ text "title"]
-      , Html.th [ Html.Attributes.class "post-url"] [ text "url"]
-      , Html.th [ Html.Attributes.class "post-type"] [ text "type"]
-      , Html.th [ Html.Attributes.class "post-time"] [ text "time"]
+      [ Html.th [ Html.Attributes.class "post-score"] [ text "Score"]
+      , Html.th [ Html.Attributes.class "post-title"] [ text "Title"]
+      , Html.th [ Html.Attributes.class "post-url"] [ text "Link"]
+      , Html.th [ Html.Attributes.class "post-type"] [ text "Type"]
+      , Html.th [ Html.Attributes.class "post-time"] [ text "Posted date"]
       ]
 
 tableBody : PostsConfig -> Time.Posix -> List Post -> Html Msg 
 tableBody config currentTime posts =
-  Html.div [] (List.map (postRow config currentTime) posts) 
+  let
+    filteredPosts = filterPosts config posts
+  in
+    Html.div [] (List.map (postRow config currentTime) filteredPosts) 
 
 postRow : PostsConfig -> Time.Posix -> Post -> Html Msg
 postRow config currentTime posts = 
@@ -113,15 +116,15 @@ sortPostsSelect : PostsConfig -> Html Msg
 sortPostsSelect config = 
   let
     options = 
-      [ ("score", "Score")
-      , ("title", "Title")
-      , ("date", "Date")
-      , ("unsorted", "Unsorted")
+      [ ("Score", "Score")
+      , ("Title", "Title")
+      , ("Posted", "Posted")
+      , ("None", "None")
       ]
   in    
   div []
     [
-    Html.select [Html.Attributes.id "select-sort-by"] (List.map (sortOptions config) options)
+     Html.select [Html.Attributes.id "select-sort-by", Html.Events.onInput (\value -> ChangeSortBy (Maybe.withDefault None (sortFromString value)) |> ConfigChanged)] (List.map (sortOptions config) options)
     ]
 
 sortOptions : PostsConfig -> (String, String) -> Html Msg
@@ -132,10 +135,13 @@ showJobPostsCheck : PostsConfig -> Html Msg
 showJobPostsCheck config =
   div [] [
         Html.input [Html.Attributes.id "checkbox-show-job-posts", Html.Attributes.type_ "checkbox", Html.Attributes.checked config.showJobs, Html.Events.onCheck (\x -> ChangeShowJobs x |> ConfigChanged)] []
+        , Html.label [Html.Attributes.for "checkbox-show-job-posts"] [text "Show job"]
+
         ] 
 
 showTextOnlyPostsCheckbox : PostsConfig -> Html Msg
 showTextOnlyPostsCheckbox config =
     div [] [
         Html.input [Html.Attributes.id "checkbox-show-text-only-posts", Html.Attributes.type_ "checkbox", checked config.showTextOnly, Html.Events.onCheck (\x -> ChangeShowTextOnly x |> ConfigChanged) ] []
+        , Html.label [Html.Attributes.for "checkbox-show-text-only-posts"] [text "Show text"]
         ]          
