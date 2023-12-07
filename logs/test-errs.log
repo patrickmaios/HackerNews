@@ -1,0 +1,21 @@
+-- UNFINISHED DEFINITION ------ D:\an3sem1\funcProg\aminceput\src\View\Posts.elm
+
+I got stuck while parsing the `postTable` definition:
+
+36| postTable : PostsConfig -> Time.Posix -> List Post -> Html Msg
+37| postTable config currentTime posts =
+                                        ^
+I was expecting to see an expression next. What is it equal to?
+
+Here is a valid definition (with a type annotation) for reference:
+
+    greet : String -> String
+    greet name =
+      "Hello " ++ name ++ "!"
+
+The top line (called a "type annotation") is optional. You can leave it off if
+you want. As you get more comfortable with Elm and as your project grows, it
+becomes more and more valuable to add them though! They work great as
+compiler-verified documentation, and they often improve error messages!
+
+`elm make` failed with exit code 1.
